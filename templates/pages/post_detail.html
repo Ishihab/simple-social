@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}{{ post.author.username }} – Simple Social{% endblock %}
+{% block content %}
+{% set post_detail = True %}
+
+  <article class="card max-w-2xl">
+  {% include "partials/post_card.html" %}
+</article>
+
+{% endblock %}

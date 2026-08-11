@@ -1,0 +1,8 @@
+@import "tailwindcss";
+@source "../templates";
+@source not "./tailwindcss";
+@source not "./daisyui{,*}.mjs";
+
+@plugin "./daisyui.mjs"{
+    themes: light --default, dim --prefersdark, corporate, business;
+};

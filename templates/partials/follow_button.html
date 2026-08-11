@@ -1,0 +1,23 @@
+{% if current_user and current_user.id != (profile.id if profile is defined else user_id) %}
+  <form
+    hx-post="/users/{{ profile.id if profile is defined else user_id }}/follow"
+    hx-target="#follow-button"
+    hx-swap="outerHTML"
+    id="follow-button"
+  >
+    <button type="submit" class="btn shrink-0 btn-primary btn-sm">
+      {% if is_following %}
+        Unfollow
+      {% else %}
+        Follow
+      {% endif %}
+    </button>
+  </form>
+  {% else %}
+    <div class="dropdown dropdown-end ml-auto">
+            <div tabindex="0" role="button" class="btn btn-circle border-0 bg-base-100 btn-ghost pb-1.5 font-extrabold text-black/70 shadow-none">&#8230;</div>
+            <ul tabindex="0" class="menu dropdown-content z-50 mt-2 w-52 space-y-1 rounded-xl border border-base-300 bg-base-100 p-2 shadow-lg">
+              <li><a href="/settings" class="rounded-lg text-sm text-error hover:bg-error/10">⚙️ Settings</a></li>
+            </ul>
+          </div>
+{% endif %}

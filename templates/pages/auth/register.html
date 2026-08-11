@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up{% endblock %}
+{% set register_page = True %}
+{% block content %}
+
+<section class="flex min-h-screen items-center justify-center bg-base-200 relative">
+      <div id="reg-error" class="hidden">
+        <div class="alert alert-error text-sm py-2">
+          <span id="reg-error-msg">Registration failed. Email or username already taken.</span>
+        </div>
+      </div>
+  <div class="card w-full max-w-lg shrink-0 bg-base-100 shadow-2xl">
+    <div class="card-body">
+      <h1 class="card-title">Sign Up</h1>
+      <form 
+        id="register-form"
+        hx-post="/auth/register"
+        hx-on::after-request="
+          if (event.detail.successful) {
+            window.location.href='/auth/login';
+          } else {
+            document.getElementById('reg-error').classList.remove('hidden');
+          }
+        "
+        hx-ext="form-json"
+      class="flex flex-col" >
+        <label class="label">Username</label>
+        <input class="input w-full" type="text" placeholder="username" name="username" />
+        <label class="label">Display Name</label>
+        <input class="input w-full" type="text" placeholder="display name" name="display_name" />
+        <label class="label">Email</label>
+        <input class="input w-full" type="email" placeholder="email" name="email" />
+        <label class="label">Password</label>
+        <input class="input w-full" type="password" placeholder="password" name="password" />
+        <button type="submit" class="btn mt-4 uppercase btn-primary">submit</button>
+      </form>
+      <a class="link link-hover">Forgot password?</a>
+      <p>Already Have An Account? <a href="/auth/login" class="link"> Log In</a></p>
+    </div>
+  </div>
+</section>
+{% endblock %}

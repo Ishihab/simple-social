@@ -1,0 +1,18 @@
+<button
+  hx-post="/posts/{{ post.id if post is defined else post_id }}/like"
+  hx-target="#like-btn-{{ post.id if post is defined else post_id }}"
+  hx-swap="innerHTML"
+  class="btn btn-circle border-0 bg-base-100 btn-ghost shadow-none btn-s">
+  {% if is_liked %}
+            <?xml version="1.0" encoding="utf-8"?>
+            <!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+            <svg width="18px" height="18px" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="M725.333333 192c-89.6 0-168.533333 44.8-213.333333 115.2C467.2 236.8 388.266667 192 298.666667 192 157.866667 192 42.666667 307.2 42.666667 448c0 253.866667 469.333333 512 469.333333 512s469.333333-256 469.333333-512c0-140.8-115.2-256-256-256z" fill="#F44336" /></svg>
+  {% else %}
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+  </svg>
+  {% endif %}
+  <span>{{ post.likes_count if post is defined else likes_count }}</span>
+</button>
+

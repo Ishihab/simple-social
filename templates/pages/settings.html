@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="card bg-base-300 p-4">
+  <h1 class="card-title text-2xl font-bold text-primary">Update Your Profile</h1>
+  <div class="card-body">
+    <div class="flex items-center gap-3">
+      <div id="avatar-section" class="flex flex-col items-center gap-4">
+  <form 
+    hx-patch="/users/me" 
+    hx-ext="form-json"
+    hx-swap="none"
+    class="flex flex-col items-center gap-3"
+    _="on htmx:afterOnLoad(detail)
+        if detail.xhr.status == 200
+          add .hidden to #avatar-actions
+          set user to detail.xhr.response as Object
+          set #avatar-preview.src to user.avatar_url
+          if #nav-img is not visible
+            remove .hidden from #nav-img
+          end
+          if #aside-img is not visible
+            remove .hidden from #aside-img
+          end
+          set #nav-img.src to user.avatar_url
+          set #aside-img.src to user.avatar_url
+          set #avatar-url-input.value to ''
+          put 'Profile updated successfully!' into #avatar-upload-status
+          remove .hidden from #avatar-upload-status
+          wait 3s then add .hidden to #avatar-upload-status
+          
+          
+        else
+          put 'Error updating profile. Please try again.' into #avatar-upload-status
+          remove .hidden from #avatar-upload-status
+          put .hidden into #avatar-actions
+          wait 3s then add .hidden to #avatar-upload-status
+        end
+          
+    
+    on handleAvatarUpload(file)
+         -- 1. Show local preview immediately & enable action buttons
+         set #avatar-preview.src to URL.createObjectURL(file)
+         remove .hidden from #avatar-actions
+         put 'Uploading…' into #avatar-upload-status
+         add @disabled to #save-avatar-btn
+
+         -- 2. Fetch presigned URL from server
+         fetch `/presign?file_name=${encodeURIComponent(file.name)}&content_type=${encodeURIComponent(file.type)}` {method: 'POST'} as Response
+         if it's ok
+           set res to it as JSON
+
+           -- 3. Direct upload to cloud storage (S3/R2)
+           fetch res.upload_url {method: 'PUT', headers: {'Content-Type': file.type}, body: file} as Response
+           if it's ok
+             set #avatar-url-input.value to res.public_url
+             put '✓ Ready to save' into #avatar-upload-status
+             remove @disabled from #save-avatar-btn
+           else
+             throw 'Upload failed'
+           end
+         else
+           throw 'Could not get presigned URL'
+         end
+
+       catch e
+         put '✗ Upload failed — try again' into #avatar-upload-status
+         log 'Avatar upload error:', e
+       end
+
+       on cancelAvatarChange
+         -- Revert back to current user avatar & reset state
+         set #avatar-preview.src to '{{ current_user.avatar_url or "#" }}'
+         set #avatar-url-input.value to ''
+         set #avatar-file-input.value to ''
+         put '' into #avatar-upload-status
+         
+       end"
+  >
+    
+    <input type="hidden" name="avatar_url" id="avatar-url-input" />
+
+    <div class="relative group">
+      <div class="avatar">
+        <div class="w-28 h-28 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2 overflow-hidden shadow-md">
+          <img 
+            id="avatar-preview" 
+            src="{{ current_user.avatar_url or '' }}" 
+            alt="User Avatar" 
+            class="object-cover w-full h-full"
+          />
+        </div>
+      </div>
+
+      <label 
+        class="btn btn-circle btn-primary btn-sm absolute bottom-0 right-0 shadow cursor-pointer hover:scale-105 transition-transform"
+        title="Change Avatar"
+      >
+        <input 
+          type="file" 
+          id="avatar-file-input" 
+          accept="image/*" 
+          class="hidden" 
+          _="on change
+               set file to my.files[0]
+               if file trigger handleAvatarUpload(file: file) on closest <form/> end"
+        />
+
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z" />
+        </svg>
+      </label>
+    </div>
+
+
+    <p id="avatar-upload-status" class="text-xs font-medium text-base-content/70 h-4"></p>
+
+
+    <div id="avatar-actions" class="hidden flex gap-2 mt-1">
+      <button 
+        type="button" 
+        class="btn btn-ghost btn-xs text-error"
+        _="on click trigger cancelAvatarChange on closest <form/>"
+      >
+        Cancel
+      </button>
+
+      <button 
+        type="submit" 
+        id="save-avatar-btn" 
+        class="btn btn-primary btn-xs px-4" 
+        disabled
+      >
+        Save Avatar
+      </button>
+    </div>
+  </form>
+</div>
+    </div>
+    <div class="divider"></div>
+    <form 
+    hx-patch="/users/me"
+    hx-ext="form-json"
+    hx-swap="none"
+    _="on htmx:afterOnLoad(detail)
+        if detail.xhr.status == 200
+          set user to detail.xhr.response as Object
+          set #userupdate-email.value to user.email
+          put user.email into #userupdate-email
+          set #userupdate-displayname.value to user.display_name
+          put user.display_name into #userupdate-displayname
+          put user.display_name into #aside-display_name
+          put '@'  + user.username into #aside-username
+          put user.bio into #aside-bio
+          set #userupdate-bio.value to user.bio
+          put user.bio into #userupdate-bio
+          put 'Profile updated successfully!' into #user-update-status
+          remove .hidden from #user-update-status
+          wait 3s then add .hidden to #user-update-status
+        else
+          put 'Error updating profile. Please try again.' into #user-update-status
+          remove .hidden from #user-update-status
+          wait 3s then add .hidden to #user-update-status
+
+        end
+
+    "
+    id="settings-form" 
+    class="space-y-4">
+            <label class="form-control">
+        <div class="label"><span class="label-text">Email</span></div>
+        <input id="userupdate-email" type="text" name="email" maxlength="100"
+          value="{{ current_user.email }}"
+          class="input input-bordered w-full" />
+      </label>
+      <label class="form-control">
+        <div class="label"><span class="label-text">Display name</span></div>
+        <input id="userupdate-displayname" type="text" name="display_name" maxlength="100" value="{{ current_user.display_name }}" class="input-bordered input w-full" />
+      </label>
+            <label class="form-control">
+        <div class="label"><span class="label-text">Bio</span></div>
+        <textarea id="userupdate-bio" name="bio" maxlength="300" rows="3"
+          class="textarea textarea-bordered w-full resize-none">{{ current_user.bio or '' }}</textarea>
+      </label>
+      <div class="card-actions justify-end mt-5">
+        <button type="submit" class="btn btn-primary">Save changes</button>
+      </div>
+          <p id="user-update-status" class="text-xs font-medium text-base-content/70 h-4"></p>
+    </form>
+  </div>
+</div>
+{% endblock %}

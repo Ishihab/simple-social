@@ -1,0 +1,43 @@
+{% for post in posts %}
+  {% set is_liked = post.id in liked_ids %}
+  <article id="post-{{ post.id }}" class="card max-w-2xl ">
+  {% include "partials/post_card.html" %}
+  </article>
+{% else %}
+{% if not profile_page %}
+  <div class="card bg-base-100 shadow">
+    <div class="card-body items-center text-base-content/50 py-12">
+      <p>Nothing here yet — follow some people to see posts!</p>
+    </div>
+  </div>
+{% else %}
+  <div class="card bg-base-100 shadow">
+    <div class="card-body items-center text-base-content/50 py-12">
+      <p>This user hasn't posted anything yet.</p>
+    </div>
+  </div>
+{% endif %}
+{% endfor %}
+
+{% if not profile_page %}
+{% if next_page %}
+<div
+  hx-get="/feed?cursor={{ next_page }}"
+  hx-trigger="revealed"
+  hx-swap="outerHTML"
+  class="flex justify-center py-4">
+  <span class="loading loading-spinner loading-sm text-primary"></span>
+</div>
+{% endif %}
+{% else %}
+{% if next_page %}
+<div
+  hx-get="/users/{{ profile_user_id }}/posts?cursor={{ next_page }}"
+  hx-trigger="revealed"
+  hx-swap="outerHTML"
+  class="flex justify-center py-4">
+  <span class="loading loading-spinner loading-sm text-primary"></span>
+</div>
+{% endif %}
+{% endif %}
+

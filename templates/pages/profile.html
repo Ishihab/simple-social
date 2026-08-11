@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}{{ profile.username }} – Simple Social{% endblock %}
+{% set profile_page = True %}
+{% set is_following = profile.is_following %}
+{% block content %}
+
+
+
+<div class="card mb-6 bg-base-100 shadow">
+  <div class="card-body p-6">
+    <div class="flex items-start justify-between gap-4">
+      <div class="sm:flex sm:items-start sm:gap-4">
+        <div class="avatar">
+          <div class="w-20 rounded-full bg-primary text-center text-primary-content">
+            <img src="{{ profile.avatar_url }}" alt="{{ profile.display_name }}" />
+          </div>
+        </div>
+        <div class="min-w-0 flex-1">
+          <h1 class="text-xl leading-tight font-bold">{{ profile.display_name }}</h1>
+          <p class="text-sm text-base-content/50">@{{ profile.username }}</p>
+          <p class="mt-2 text-sm">{{ profile.bio if profile.bio else '' }}</p>
+        </div>
+      </div>
+
+      {% include "partials/follow_button.html" %}
+    </div>
+      <div class="stats mt-4 w-full stats-horizontal rounded-box border border-base-200 shadow-none">
+    <div class="stat px-4 py-2">
+      <div class="stat-value text-lg">{{ profile.posts_count }}</div>
+      <div class="stat-desc">Posts</div>
+    </div>
+    <button class="stat cursor-pointer px-4 py-2 text-left transition hover:bg-base-200" hx-get="/users/profile/{{ profile.id }}/followers" hx-target="#people-panel" hx-swap="innerHTML">
+      <div class="stat-value text-lg">{{ profile.followers_count }}</div>
+      <div class="stat-desc">Followers</div>
+    </button>
+    <button class="stat cursor-pointer px-4 py-2 text-left transition hover:bg-base-200" hx-get="/users/profile/{{ profile.id }}/following" hx-target="#people-panel" hx-swap="innerHTML">
+      <div class="stat-value text-lg">{{ profile.following_count }}</div>
+      <div class="stat-desc">Following</div>
+    </button>
+  </div>
+  </div>
+</div>
+  {% include "partials/post_list.html" %}
+
+{% endblock %}

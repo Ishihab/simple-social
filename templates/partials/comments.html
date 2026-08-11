@@ -1,0 +1,48 @@
+    <li id="comment-{{ comment.id }}" class="list-row">
+      <a href="/users/profile/{{ comment.author.id }}" class="placeholder avatar shrink-0">
+        <div class="w-10 rounded-full bg-primary text-primary-content">
+          {% if comment.author.avatar_url %}
+          <img src="{{ comment.author.avatar_url }}" alt="{{ comment.author.username }}" />
+          {% else %}
+          <span class="text-sm font-bold">{{ comment.author.display_name[0] | upper }}</span>
+          {% endif %}
+        </div>
+      </a>
+      <div>
+        <p class="flex flex-col sm:items-center sm:flex-row sm:gap-2"><span class="font-bold text-xs sm:text-sm"><a href="/users/profile/{{ comment.author.id }}">{{ comment.author.display_name }}</a></span><span class="text-xs text-neutral-600">@{{ comment.author.username }}</span></p>
+        <div>
+          <p id="text-content-{{ comment.id }}" class="line-clamp-2 transition-all duration-300">{{ comment.content }}</p>
+
+          <button
+            class="btn mt-1 btn-link p-0 no-underline btn-xs"
+            _="on load
+                if #text-content-{{ comment.id }}.innerText.length <= 45
+                  add .hidden to me
+                end
+              end
+            on click 
+               toggle .line-clamp-2 on #text-content-{{ comment.id }}
+               if #text-content-{{ comment.id }}.classList.contains('line-clamp-2') 
+                 set me.innerText to 'See More' 
+               else 
+                 set me.innerText to 'See Less'
+               end"
+          >
+            See More
+          </button>
+        </div>
+      </div>
+        {% if current_user and (current_user.id == comment.author.id or current_user.is_superuser) %}
+        <div class="dropdown dropdown-end ml-auto">
+          <div tabindex="0" role="button" class="btn btn-circle border-0 bg-base-100 btn-ghost pb-6 font-extrabold text-black/70 shadow-none">&#8230;</div>
+          <ul tabindex="0" class="menu dropdown-content z-50 mt-2 w-52 space-y-1 rounded-xl border border-base-300 bg-base-100 p-2 shadow-lg">
+            <li><button 
+                hx-delete="/posts/{{ comment.post_id }}/comments/{{ comment.id }}"
+                hx-target="#comment-{{ comment.id }}"
+                hx-swap="outerHTML"
+                hx-confirm="Delete this comment?"
+                class="rounded-lg text-sm text-error hover:bg-error/10">Delete</button></li>
+          </ul>
+        </div>
+        {% endif %}
+    </li>

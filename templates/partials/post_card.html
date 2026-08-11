@@ -1,0 +1,94 @@
+    <div class="card-body rounded-box bg-base-100 p-5 gap-3">
+      <div class="flex justify-between">
+        <div class="flex items-center gap-3">
+          <a href="/users/profile/{{ post.author.id }}" class="placeholder avatar shrink-0">
+            <div class="w-10 rounded-full bg-primary text-primary-content">
+              <img src="{{ post.author.avatar_url }}" alt="{{ post.author.username }}" />
+            </div>
+          </a>
+          <div class="min-w-0 flex-1">
+            <a href="/users/profile/{{ post.author.id }}" class="text-sm leading-tight font-semibold hover:underline">{{ post.author.display_name }}</a>
+            <p class="text-xs text-base-content/50">@{{ post.author.username }}</p>
+          </div>
+        </div>
+        {% if current_user and (current_user.id == post.author_id or current_user.is_super_user) %}
+        <div class="dropdown dropdown-end">
+          <div tabindex="0" role="button" class="btn btn-circle border-0 bg-base-100 btn-ghost pb-1.5 font-extrabold text-black/70 shadow-none">&#8230;</div>
+          <ul tabindex="0" class="menu dropdown-content z-50 mt-2 w-52 space-y-1 rounded-xl border border-base-300 bg-base-100 p-2 shadow-lg">
+            <li><a 
+                hx-delete="/posts/{{ post.id }}"
+                hx-target="#post-{{ post.id }}"
+                hx-swap="outerHTML"
+                hx-confirm="Delete this post?"
+                class="rounded-lg text-sm text-error hover:bg-error/10">Delete</a></li>
+          </ul>
+        </div>
+        {% endif %}
+      </div>
+      {% if not post_detail %}
+      <a href="/posts/{{ post.id }}">
+        {% endif %}
+      <p class="text-sm whitespace-pre-wrap mb-2">{{ post.content }}</p>
+      <figure>
+        <img src="{{ post.image_url }}" class="rounded-xl" />
+      </figure>
+      {% if not post_detail %}
+      </a>
+        {% endif %}
+      <div class="flex items-center gap-3">
+        <div id="like-btn-{{ post.id if post is defined else post_id }}" class="flex items-center gap-1">
+            {% include "partials/like_button.html" %}
+        </div>
+        <div class="flex items-center gap-1">
+          <a href="/posts/{{ post.id }}" class="btn btn-circle border-0 bg-base-100 btn-ghost shadow-none btn-xs">
+            <?xml version="1.0" encoding="utf-8"?>
+            <!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+            <svg fill="#000000" width="18px" height="18px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg">
+              <path d="M16.5 1.853c-8.133 0-14.75 5.663-14.75 12.624 0.045 2.863 1.132 5.465 2.896 7.45l-0.010-0.012c-0.608 2.418-1.844 4.491-3.525 6.104l-0.004 0.004c-0.22 0.225-0.355 0.534-0.355 0.873 0 0.691 0.56 1.252 1.252 1.252 0.089 0 0.175-0.009 0.259-0.027l-0.008 0.001c3.458-0.576 6.524-1.93 9.121-3.877l-0.054 0.039c1.547 0.517 3.328 0.816 5.179 0.817h0c8.133 0 14.75-5.664 14.75-12.625s-6.617-12.624-14.75-12.624zM16.5 24.602c-0.015 0-0.034 0-0.052 0-1.77 0-3.465-0.321-5.030-0.908l0.099 0.032c-0.045-0.011-0.1-0.020-0.155-0.025l-0.005-0c-0.085-0.025-0.182-0.041-0.283-0.045l-0.002-0c-0.074 0.005-0.142 0.016-0.207 0.033l0.008-0.002c-0.1 0.013-0.19 0.035-0.275 0.068l0.008-0.003c-0.079 0.039-0.146 0.081-0.209 0.129l0.003-0.002c-0.064 0.033-0.118 0.067-0.169 0.105l0.003-0.002c-1.371 1.186-3 2.115-4.789 2.69l-0.098 0.027c0.896-1.391 1.555-3.025 1.872-4.778l0.012-0.082c0.005-0.031-0.005-0.060-0.002-0.092 0.002-0.028 0.003-0.060 0.003-0.093 0-0.311-0.107-0.597-0.286-0.824l0.002 0.003c-0.019-0.023-0.025-0.051-0.046-0.073-1.617-1.608-2.626-3.826-2.652-6.28l-0-0.005c0-5.582 5.495-10.124 12.25-10.124s12.25 4.542 12.25 10.124-5.496 10.125-12.25 10.125z"></path>
+            </svg>
+          </a>
+          <p class="text-xs font-semibold">{{ post.comments_count }}</p>
+        </div>
+      </div>
+      {% if post_detail %}
+      <div class="divider m-0"></div>
+          <form
+      hx-post="/posts/{{ post.id }}/comments"
+      hx-target="#comment-list"
+      hx-swap="afterbegin"
+      hx-on::after-request="if(event.detail.successful) this.reset()"
+      class="flex gap-3 p-3 pt-0 bg-base-100 items-center">
+
+      <div class="avatar placeholder shrink-0">
+        <div class="bg-primary text-primary-content rounded-full w-9">
+          {% if current_user.avatar_url %}
+          <img src="{{ current_user.avatar_url }}" alt="{{ current_user.username }}" />
+          {% else %}
+          <span class="text-sm font-bold">{{ current_user.display_name[0] | upper }}</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <input type="text" name="content" required maxlength="500"
+        placeholder="Write a comment…"
+        class="input input-bordered flex-1 text-sm h-9" />
+
+      <button type="submit" class="btn btn-primary btn-sm">Reply</button>
+    </form>
+      {% endif %}
+    </div>
+    {% if post_detail %}
+    <div class="card bg-base-100 shadow mt-4">
+  <ul class="list rounded-box shadow-md">
+    {% if not post.comments %}
+    <p class="text-base-content/50 text-sm text-center py-6">No comments yet. Be the first!</p>
+    {% endif %}
+    <div id="comment-list">
+      {% for comment in post.comments %}
+        {% include "partials/comments.html" %}
+      {% endfor %}
+    </div>
+  </ul>
+</div>
+    {% endif %}
+
