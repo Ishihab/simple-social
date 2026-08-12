@@ -66,7 +66,7 @@ async def populate_database(num_users: int, num_posts_per_user: int, num_comment
         await session.commit()
 
 if __name__ == "__main__":
-    asyncio.run(create_user("admin@example.com", "password123", "admin", "Admin User", avatar_url="https://avatars.githubusercontent.com/u/97165289", is_superuser=True))
+    #asyncio.run(create_user("admin@example.com", "password123", "admin", "Admin User", avatar_url="https://avatars.githubusercontent.com/u/97165289", is_superuser=True))
     num_users = 100
     num_posts_per_user = 20
     num_comments_per_post = 30

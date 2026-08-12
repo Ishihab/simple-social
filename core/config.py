@@ -44,6 +44,7 @@ class Settings(BaseSettings):
             path=self.POSTGRES_DB,
         )
     #s3 compatibible object storage
+    #boto3 get access key and secret access key from env variables
     REGION_NAME: str = ""
     BUCKET_NAME: str = ""
     ENDPOINT_URL: str | None = None

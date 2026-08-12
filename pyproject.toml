@@ -5,18 +5,25 @@ description = "Simple social media web app"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "aiosqlite>=0.22.1",
     "alembic>=1.18.5",
     "apscheduler>=3.11.3",
     "asyncpg>=0.31.0",
     "boto3>=1.38.0",
-    "faker>=40.36.0",
+    "fastapi>=0.141.1",
     "fastapi-pagination>=0.15.16",
     "fastapi-users[sqlalchemy]>=15.0.5",
-    "fastapi[standard]>=0.141.1",
+    "jinja2>=3.1.6",
     "prometheus-fastapi-instrumentator>=8.1.0",
     "pydantic-settings>=2.7.0",
+    "python-multipart>=0.0.32",
     "sqlakeyset>=2.0.1775222100",
     "sqlalchemy>=2.0.51",
     "structlog>=26.1.0",
+    "uvicorn[standard]>=0.52.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "aiosqlite>=0.22.1",
+    "faker>=40.36.0",
 ]
