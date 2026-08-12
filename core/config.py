@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pathlib import Path
+from pydantic import PostgresDsn, computed_field
 
 
 ENV_FILE = Path(__file__).parent.parent / ".env"
@@ -17,12 +18,31 @@ class Settings(BaseSettings):
     LOG_ACCESS_NAME: str = "{APP_NAME}.access_logs"
 
 
-    DATABASE_URL: str = "sqlite+aiosqlite:///./test.db"
     DEBUG: bool = False
 
     SECRET_KEY: str = "djd232df34kdjfiejwinccdknslejdjf"
     COOKIE_MAX_AGE: int = 3600 * 24 * 7  # 7 days
 
+    ENABLE_METRICS: bool = True
+
+
+    POSTGRES_SERVER: str
+    POSTGRES_PORT: int | None = None
+    POSTGRES_USER: str
+    POSTGRES_PASSWORD: str = ""
+    POSTGRES_DB: str = ""
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def SQLALCHEMY_DATABASE_URI(self) -> PostgresDsn:
+        return PostgresDsn.build(
+            scheme="postgresql+asyncpg",
+            username=self.POSTGRES_USER,
+            password=self.POSTGRES_PASSWORD,
+            host=self.POSTGRES_SERVER,
+            port=self.POSTGRES_PORT,
+            path=self.POSTGRES_DB,
+        )
     #s3 compatibible object storage
     REGION_NAME: str = ""
     BUCKET_NAME: str = ""

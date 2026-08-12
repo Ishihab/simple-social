@@ -19,6 +19,7 @@ from utils import delete_orphaned_objects
 from api.dependency import get_async_session
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Annotated
+from api.route.debug import router as debug_router
 
 
 from logging_config import setup_logging
@@ -27,14 +28,8 @@ from core.config import settings
 
 import asyncio
 
-from prometheus_fastapi_instrumentator import Instrumentator, metrics
-
-
-
-instrumentator = Instrumentator(
-    should_group_status_codes=True,
-    
-)       
+from metrics import instrumentator
+     
 
 
 @asynccontextmanager
@@ -44,13 +39,12 @@ async def lifespan(app: FastAPI):
     loop.slow_callback_duration = 0.1
     setup_logging(json_logs=settings.LOG_JSON_FORMAT, log_level=settings.LOG_LEVEL)
     scheduler = AsyncIOScheduler()
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
     register_jobs(scheduler)
     scheduler.start()
     try:
         yield
     finally:
+        print("Shutting down scheduler...")
         scheduler.shutdown()
 
 app = FastAPI(lifespan=lifespan)
@@ -69,6 +63,7 @@ app.include_router(posts_router)
 app.include_router(comments_router)
 app.include_router(likes_router)
 app.include_router(uploads_router)
+app.include_router(debug_router, prefix="/debug", tags=["debug"])
 add_pagination(app)
 app.include_router(fastapi_users.get_auth_router(auth_backend), prefix="/auth/cookie", tags=["auth"])
 
@@ -81,3 +76,4 @@ async def health_check():
     return HTMLResponse(content="OK", status_code=200)
 
 
+instrumentator.instrument(app).expose(app)
