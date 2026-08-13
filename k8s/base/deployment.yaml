@@ -17,7 +17,7 @@ spec:
         app: simple-social
       annotations:
         prometheus.io/scrape: "true"
-        prometheus.io/port: "8080"
+        prometheus.io/port: "80"
         prometheus.io/path: "/metrics"
     spec:
       serviceAccountName: simple-social
@@ -25,7 +25,7 @@ spec:
         - name: simple-social
           image: simple-social:v2
           ports:
-            - containerPort: 8080
+            - containerPort: 80
           envFrom:
             - configMapRef:
                 name: simple-social-config
@@ -41,13 +41,13 @@ spec:
           readinessProbe:
             httpGet:
               path: /healthz
-              port: 8080
+              port: 80
             initialDelaySeconds: 5
             periodSeconds: 10
           livenessProbe:
             httpGet:
               path: /healthz
-              port: 8080
+              port: 80
             initialDelaySeconds: 15
             periodSeconds: 20
       topologySpreadConstraints:
