@@ -16,6 +16,9 @@ __pycache__/
 templates-copy
 templates-copy/
 static/tailwindcss
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
 
 
 *.db
