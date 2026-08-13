@@ -23,6 +23,7 @@ static/tailwindcss
 
 *.db
 *db
+file:*
 
 
 
