@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: simple-social
+  namespace: simple-social
+  labels:
+    app: simple-social
+
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: simple-social
+  template:
+    metadata:
+      labels:
+        app: simple-social
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: simple-social
+      containers:
+        - name: simple-social
+          image: simple-social:v2
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: simple-social-config
+            - secretRef:
+                name: simple-social-secrets
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 20
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: simple-social
