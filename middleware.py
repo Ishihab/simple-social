@@ -1,9 +1,11 @@
 import time
 import uuid
-from fastapi import FastAPI, Request
+
 import structlog
+from fastapi import FastAPI, Request
 
 logger = structlog.get_logger()
+
 
 def add_structlog_middleware(app: FastAPI):
     @app.middleware("http")

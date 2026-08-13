@@ -3,6 +3,7 @@ import sys
 
 import structlog
 
+
 def setup_logging(json_logs: bool = False, log_level: str = "INFO"):
 
     shared_processors = [
@@ -22,7 +23,8 @@ def setup_logging(json_logs: bool = False, log_level: str = "INFO"):
         renderer = structlog.dev.ConsoleRenderer()
 
     structlog.configure(
-        processors=shared_processors + [
+        processors=shared_processors
+        + [
             structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
         ],
         logger_factory=structlog.stdlib.LoggerFactory(),

@@ -7,7 +7,7 @@ instrumentator = Instrumentator(
     should_instrument_requests_inprogress=True,
     excluded_handlers=[".*admin.*", "/metrics"],
     inprogress_name="inprogress",
-    inprogress_labels=True
+    inprogress_labels=True,
 )
 
 instrumentator.add(
@@ -26,4 +26,4 @@ instrumentator.add(
         metric_namespace="simple_social",
         metric_subsystem="response_size",
     )
-) 
+)

@@ -1,30 +1,40 @@
 import asyncio
-from pathlib import Path
 import sys
+from pathlib import Path
+
 parent_dir = Path(__file__).resolve().parent.parent
 
 sys.path.append(str(parent_dir))
-from utils import create_user
-from models import User, Post, Comment, Like, Follow
-import faker
 import random
 
+import faker
 
 from core.db import AsyncSessionLocal
+from models import Comment, Follow, Like, Post
+from utils import create_user
 
 fake = faker.Faker()
 
 
-async def populate_database(num_users: int, num_posts_per_user: int, num_comments_per_post: int, num_likes_per_post: int):
+async def populate_database(
+    num_users: int,
+    num_posts_per_user: int,
+    num_comments_per_post: int,
+    num_likes_per_post: int,
+):
     users = []
     for _ in range(num_users):
         email = fake.unique.email()
         password = "password123"
         username = fake.pystr(min_chars=5, max_chars=15)
         display_name = fake.name()
-        avatar_url = f"https://avatars.githubusercontent.com/u/{random.randint(1, 100000)}"
-        user = await create_user(email, password, username, display_name, avatar_url=avatar_url)
-        
+        avatar_url = (
+            f"https://avatars.githubusercontent.com/u/{random.randint(1, 100000)}"
+        )
+        user = await create_user(
+            email, password, username, display_name, avatar_url=avatar_url
+        )
+
         users.append(user)
     if not users:
         print("No users created. Exiting.")
@@ -35,13 +45,17 @@ async def populate_database(num_users: int, num_posts_per_user: int, num_comment
             for follower in users:
                 for followee in users:
                     if follower != followee:
-                        follow = Follow(follower_id=follower.id, followee_id=followee.id)
+                        follow = Follow(
+                            follower_id=follower.id, followee_id=followee.id
+                        )
                         session.add(follow)
             posts = []
             for user in users:
                 for _ in range(num_posts_per_user):
                     content = fake.text(max_nb_chars=280)
-                    post = Post(author_id=user.id, content=content, image_url=fake.image_url())
+                    post = Post(
+                        author_id=user.id, content=content, image_url=fake.image_url()
+                    )
                     session.add(post)
                     posts.append(post)
             await session.flush()  # Ensure post.id is available
@@ -50,7 +64,9 @@ async def populate_database(num_users: int, num_posts_per_user: int, num_comment
                     post_id = post.id
                     author_id = random.choice(users).id
                     content = fake.text(max_nb_chars=500)
-                    comment = Comment(post_id=post_id, author_id=author_id, content=content)
+                    comment = Comment(
+                        post_id=post_id, author_id=author_id, content=content
+                    )
                     session.add(comment)
                     post.comments_count += 1
             existing_likes = set()
@@ -65,13 +81,16 @@ async def populate_database(num_users: int, num_posts_per_user: int, num_comment
                         post.likes_count += 1
         await session.commit()
 
+
 if __name__ == "__main__":
-    #asyncio.run(create_user("admin@example.com", "password123", "admin", "Admin User", avatar_url="https://avatars.githubusercontent.com/u/97165289", is_superuser=True))
+    # asyncio.run(create_user("admin@example.com", "password123", "admin", "Admin User", avatar_url="https://avatars.githubusercontent.com/u/97165289", is_superuser=True))
     num_users = 100
     num_posts_per_user = 20
     num_comments_per_post = 30
-    num_likes_per_post = num_users 
+    num_likes_per_post = num_users
 
-    asyncio.run(populate_database(num_users, num_posts_per_user, num_comments_per_post, num_likes_per_post))
-                
-        
+    asyncio.run(
+        populate_database(
+            num_users, num_posts_per_user, num_comments_per_post, num_likes_per_post
+        )
+    )
