@@ -5,17 +5,18 @@
 {% block content %}
 
 
-<section class="flex min-h-screen items-center justify-center bg-base-100 relative">
+<section id="login-page" class="flex min-h-screen items-center justify-center bg-base-100 relative">
   <div class="card w-full max-w-lg shrink-0 bg-base-100 shadow-2xl">
     <div class="card-body">
-      <h2 class="card-title text-2xl justify-center mb-2">Welcome back</h2>
+      <h2 id="login-page-welcome" class="card-title text-2xl justify-center mb-2">Welcome back</h2>
 
       <div id="login-error" class="hidden">
         <div class="alert alert-error text-sm py-2">
           <span>Invalid email or password.</span>
         </div>
       </div>
-      <form         id="login-form"
+      <form  
+        id="login-form"
         hx-post="/auth/cookie/login"
         hx-on::after-request="
           if (event.detail.successful) {

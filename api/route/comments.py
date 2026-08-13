@@ -53,7 +53,7 @@ async def delete_comment(
         raise HTTPException(status_code=500, detail="Could not delete comment")
     if not success:
         logger.info(f"Comment not found or user unauthorized to delete", comment_id=str(comment_id), post_id=str(post_id))
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Comment not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Comment not found or user unauthorized to delete")
     logger.info(f"Comment deleted successfully", comment_id=str(comment_id), post_id=str(post_id))
     
     return HTMLResponse(content="", status_code=status.HTTP_200_OK)

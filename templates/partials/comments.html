@@ -1,4 +1,4 @@
-    <li id="comment-{{ comment.id }}" class="list-row">
+    <li id="comment-{{ comment.id }}" data="comment-body" data-post-id="{{ comment.post_id }}" data-comment-id="{{ comment.id }}" class="list-row">
       <a href="/users/profile/{{ comment.author.id }}" class="placeholder avatar shrink-0">
         <div class="w-10 rounded-full bg-primary text-primary-content">
           {% if comment.author.avatar_url %}

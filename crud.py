@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import selectinload
 from fastapi_pagination.cursor import CursorParams, CursorPage
-from fastapi_pagination.ext.sqlalchemy import paginate
+from fastapi_pagination.ext.sqlalchemy import apaginate 
 from models import User, Post, Comment, Like, Follow, ObjectStoreObject
 import schemas
 from datetime import datetime, timedelta, timezone
@@ -38,7 +38,7 @@ async def get_feed_posts(session: AsyncSession, user_id: UUID, cursor_params: Cu
         .options(selectinload(Post.author))
     )
     try:
-        return await paginate(session, query, params=cursor_params)
+        return await apaginate(session, query, params=cursor_params)
     except SQLAlchemyError as e:
         logger.exception("Failed to get feed posts", operation="get_feed_posts", user_id=str(user_id))
         raise DatabaseReadError(f"Failed to load feed posts") 
@@ -93,7 +93,7 @@ async def get_user_posts(session: AsyncSession, user_id: UUID, cursor_params: Cu
         .options(selectinload(Post.author))
     )
     try:
-        return await paginate(session, query, params=cursor_params)
+        return await apaginate(session, query, params=cursor_params)
     except SQLAlchemyError as e:
         logger.exception("Failed to get user posts", operation="get_user_posts", user_id=str(user_id))
         raise DatabaseReadError(f"Failed to load user posts") 
@@ -243,7 +243,7 @@ async def get_followers(session: AsyncSession, user_id: UUID, cursor_params: Cur
         .order_by(Follow.created_at.desc(), Follow.follower_id.desc())
     )
     try:
-        return await paginate(session, query, params=cursor_params)
+        return await apaginate(session, query, params=cursor_params)
     except SQLAlchemyError as e:
         logger.exception("Failed to fetch followers", operation="get_followers", user_id=str(user_id))
         raise DatabaseReadError(f"Failed to fetch followers") 
@@ -256,7 +256,7 @@ async def get_following(session: AsyncSession, user_id: UUID, cursor_params: Cur
         .order_by(Follow.created_at.desc(), Follow.followee_id.desc())
     )
     try:
-        return await paginate(session, query, params=cursor_params)
+        return await apaginate(session, query, params=cursor_params)
     except SQLAlchemyError as e:
         logger.exception("Failed to fetch following", operation="get_following", user_id=str(user_id))
         raise DatabaseReadError(f"Failed to fetch following") 
@@ -355,7 +355,7 @@ async def search_users(session: AsyncSession, query_str: str, cursor_params: Cur
         .order_by(User.username.asc())
     )
     try:
-        return await paginate(session, query, params=cursor_params)
+        return await apaginate(session, query, params=cursor_params)
     except SQLAlchemyError as e:
         logger.exception("Failed to search users", operation="search_users", query_str=query_str)
         raise DatabaseReadError(f"Failed to search users") 
@@ -368,7 +368,7 @@ async def search_posts(session: AsyncSession, query_str: str, cursor_params: Cur
         .options(selectinload(Post.author))
     )
     try:
-        return await paginate(session, query, params=cursor_params)
+        return await apaginate(session, query, params=cursor_params)
     except SQLAlchemyError as e:
         logger.exception("Failed to search posts", operation="search_posts", query_str=query_str)
         raise DatabaseReadError(f"Failed to search posts") 
@@ -382,7 +382,7 @@ async def get_all_users(session: AsyncSession, cursor_params: CursorParams, curr
         .order_by(User.username.asc())
     )
     try:
-        return await paginate(session, query, params=cursor_params)
+        return await apaginate(session, query, params=cursor_params)
     except SQLAlchemyError as e:
         logger.exception("Failed to fetch all users", operation="get_all_users", current_user_id=str(current_user.id))
         raise DatabaseReadError(f"Failed to fetch all users") 

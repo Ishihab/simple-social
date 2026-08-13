@@ -16,15 +16,21 @@ get_async_session_context = asynccontextmanager(get_async_session)
 get_user_db_context = asynccontextmanager(get_user_db)
 get_user_manager_context = asynccontextmanager(get_user_manager)
 
-async def create_user(email: str, password: str, username: str, display_name: str, avatar_url: str | None = None, is_superuser: bool = False):
+async def create_user(email: str, password: str, username: str, display_name: str, avatar_url: str | None = None, is_superuser: bool = False, session: AsyncSession | None = None):
+    async def _create(session):
+        async with get_user_db_context(session) as user_db:
+            async with get_user_manager_context(user_db) as user_manager:
+                user_create = UserCreate(email=email, password=password, is_superuser=is_superuser, username=username, display_name=display_name, avatar_url=avatar_url)
+                user = await user_manager.create(user_create)
+                print(f"User {user.id} created successfully.")
+                return user
     try:
-        async with get_async_session_context() as session:
-            async with get_user_db_context(session) as user_db:
-                async with get_user_manager_context(user_db) as user_manager:
-                    user_create = UserCreate(email=email, password=password, is_superuser=is_superuser, username=username, display_name=display_name, avatar_url=avatar_url)
-                    user = await user_manager.create(user_create)
-                    print(f"User {user.id} created successfully.")
-                    return user
+        if session is not None:
+            return await _create(session)
+        else:
+            async with get_async_session_context() as session:
+                return await _create(session)
+
     except UserAlreadyExists:
         print(f"User with email {email} already exists.")
         raise

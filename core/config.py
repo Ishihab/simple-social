@@ -20,6 +20,12 @@ class Settings(BaseSettings):
 
     DEBUG: bool = False
 
+    FIRST_SUPERUSER_EMAIL: str = "admin@example.com"
+    FIRST_SUPERUSER_PASSWORD: str = "password_123"
+    FIRST_SUPERUSER_USERNAME: str = "admin"
+    FIRST_SUPERUSER_DISPLAY_NAME: str = "Admin"
+    
+
     SECRET_KEY: str = "djd232df34kdjfiejwinccdknslejdjf"
     COOKIE_MAX_AGE: int = 3600 * 24 * 7  # 7 days
 

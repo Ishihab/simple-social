@@ -1,4 +1,6 @@
 <button
+  id="like-btn"
+  data-response="{{ is_liked }}"
   hx-post="/posts/{{ post.id if post is defined else post_id }}/like"
   hx-target="#like-btn-{{ post.id if post is defined else post_id }}"
   hx-swap="innerHTML"
