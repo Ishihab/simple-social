@@ -1,7 +1,10 @@
 .env
-.venv/
+code/.env
+code/.venv/
 .env.*
+code/.venv
 .venv
+.venv/
 env/
 venv/
 ENV/
@@ -13,12 +16,13 @@ __pycache__/
 *.py[cod]
 *$py.class
 .python-version
-templates-copy
-templates-copy/
-static/tailwindcss
+code/templates-copy
+code/templates-copy/
+code/static/tailwindcss
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+
 
 
 *.db
