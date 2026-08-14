@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
 from core.config import settings
-from core.db import Base
+from core.db import Base, engine
 from models import AccessToken, User, Post, Comment, Like, Follow 
 
 # this is the Alembic Config object, which provides
@@ -47,7 +47,7 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    url = config.get_main_option("sqlalchemy.url")
+    url = str(engine.url)
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -72,11 +72,7 @@ async def run_async_migrations() -> None:
 
     """
 
-    connectable = async_engine_from_config(
-        config.get_section(config.config_ini_section, {}),
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-    )
+    connectable = engine
 
     async with connectable.connect() as connection:
         await connection.run_sync(do_run_migrations)
