@@ -6,7 +6,7 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
-from core.config import settings
+
 from core.db import Base, engine
 from models import AccessToken, User, Post, Comment, Like, Follow 
 
@@ -15,7 +15,6 @@ from models import AccessToken, User, Post, Comment, Like, Follow
 config = context.config
 
 
-DATABASE_URL = str(settings.SQLALCHEMY_DATABASE_URI)
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 if config.config_file_name is not None:
@@ -32,7 +31,6 @@ target_metadata = Base.metadata
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
-config.set_main_option("sqlalchemy.url", DATABASE_URL)
 
 
 def run_migrations_offline() -> None:
@@ -48,6 +46,7 @@ def run_migrations_offline() -> None:
 
     """
     url = str(engine.url)
+    print(f"Running migrations offline with URL: {url}")
     context.configure(
         url=url,
         target_metadata=target_metadata,

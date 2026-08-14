@@ -15,4 +15,4 @@ patches:
 images:
   - name: simple-social
     newName: 0142365870/simple-social
-    newTag: v4
+    newTag: v5
