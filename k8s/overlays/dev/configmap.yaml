@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: simple-social-config
+  namespace: simple-social
+
+data:
+  BUCKET_NAME: "simple-social"
+  REGION_NAME: "us-east-1"
+  ENABLE_METRICS: "True"
+  APP_NAME: "Simple Social"
+  DEBUG: "False"
+  LOG_JSON_FORMAT: "True"
+  LOG_NAME: "simple-social.app_logs"
+  LOG_ACCESS_NAME: "simple-social.access_logs"
+  LOG_LEVEL: "INFO"
+  COOKIE_MAX_AGE: "604800"
