@@ -41,7 +41,11 @@ async def create_user(
                     display_name=display_name,
                     avatar_url=avatar_url,
                 )
-                user = await user_manager.create(user_create)
+                try:
+                    user = await user_manager.create(user_create)
+                except UserAlreadyExists:
+                    logger.info(f"User with email {email} already exists.")
+                    raise
                 print(f"User {user.id} created successfully.")
                 return user
 
