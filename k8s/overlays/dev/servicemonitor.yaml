@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: simple-social
+  namespace: simple-social
+  labels:
+    release: kube-prometheus-stack
+spec:
+  selector:
+    matchLabels:
+      app: simple-social
+  namespaceSelector:
+    matchNames:
+      - simple-social
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 30s
