@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: create-first-superuser-job
+  namespace: simple-social
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    argocd.argoproj.io/hook-weight: "1"
+spec:
+  backoffLimit: 2
+  template:
+    spec:
+      restartPolicy: Never
+      serviceAccountName: simple-social
+      containers:
+        - name: create-first-superuser
+          image: simple-social:latest
+          command: ["python", "-m", "scripts.create_user"]
+          envFrom:
+            - secretRef:
+                name: simple-social-secrets
+            - configMapRef:
+                name: simple-social-config

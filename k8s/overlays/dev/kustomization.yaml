@@ -7,6 +7,8 @@ resources:
   - external-secrets.yaml
   - configmap.yaml
   - external-secrets-store-sm.yaml
+  - create-first-superuser-job.yaml
+  - db-migrate-job.yaml
 
 patches:
   - path: ingress-patch.yaml 
@@ -14,4 +16,4 @@ patches:
 images:
   - name: simple-social
     newName: 0142365870/simple-social
-    newTag: v2
+    newTag: v3
