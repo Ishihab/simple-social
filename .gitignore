@@ -25,7 +25,7 @@ code/static/tailwindcss
 
 k8s/overlays/local/
 
-
+act-history.json
 *.db
 *db
 file:*
