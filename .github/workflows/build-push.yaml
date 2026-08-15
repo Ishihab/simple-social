@@ -85,7 +85,7 @@ jobs:
       updated-kustomization: ${{ steps.commit-pr.outputs.updated-kustomization }}
     defaults:
       run:
-        working-directory: k8s/overlay/dev
+        working-directory: k8s/overlays/dev
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
