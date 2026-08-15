@@ -82,7 +82,7 @@ jobs:
     needs: build-scan-push
     runs-on: ubuntu-24.04
     outputs:
-      updated-kustomization: ${{ steps.commit-pr.outputs.updated-kustomization }}
+      updated-kustomization: ${{ steps.bump-image-tag.outputs.updated-kustomization }}
     defaults:
       run:
         working-directory: k8s/overlays/dev
@@ -90,24 +90,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
 
-      - name: Bump image tag in kustomization.yaml
-    
+      - name:  Bump image tag in kustomization.yaml
         env:
           IMAGE_TAG: ${{ needs.build-scan-push.outputs.image-tag }}
           IMAGE_NAME: ${{ needs.build-scan-push.outputs.image-name }}
-        run: |
-          echo "Updating image name and tag in kustomization.yaml"
-          yq -i '(.images[] | select(.name == "simple-social")) .newName = env.IMAGE_NAME | (.images[] | select(.name == "simple-social")) .newTag = env.IMAGE_TAG' kustomization.yaml
-          cat kustomization.yaml > updated_kustomization.yaml
-      - name: Updated kustomization.yaml
-        id: commit-pr
-        run: |
-          echo "updated-kustomization=$(cat updated_kustomization.yaml)" >> $GITHUB_OUTPUT
+        uses: mikefarah/yq@1b9b4ac5187171d2e5e3129be0cfa827c7f9d53d
+        with:
+          cmd: yq -i '(.images[] | select(.name == "simple-social")) .newName = strenv(IMAGE_NAME) | (.images[] | select(.name == "simple-social")) .newTag = strenv(IMAGE_TAG)' kustomization.yaml
+
+      - name: output updated kustomization.yaml
+        id: bump-image-tag
+        run: echo "updated-kustomization=$(cat kustomization.yaml)" >> $GITHUB_OUTPUT
       - name: Commit and open PR
         uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "Bump image tag to ${{ needs.build-scan-push.outputs.image-tag }}\n\nUpdated kustomization file {{ steps.commit-pr.outputs.updated-kustomization }}"
+          commit-message: "Bump image tag to ${{ needs.build-scan-push.outputs.image-tag }}\n\nUpdated kustomization file ${{ steps.bump-image-tag.outputs.updated-kustomization }}"
           title: "Bump image tag to ${{ needs.build-scan-push.outputs.image-tag }}"
           body: "This PR bumps the image tag to ${{ needs.build-scan-push.outputs.image-tag }}. Updated kustomization.yaml is attached."
           branch: bump-image-tag-{{ needs.build-scan-push.outputs.image-tag }}
