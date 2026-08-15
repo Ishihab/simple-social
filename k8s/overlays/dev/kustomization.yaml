@@ -11,5 +11,5 @@ patches:
   - path: ingress-patch.yaml
 images:
   - name: simple-social
-    newName: 0142365870/simple-social
-    newTag: v9
+    newName: 992646609003.dkr.ecr.us-east-1.amazonaws.com/gitops-infra-terraform-ecr
+    newTag: sha-80f458c
