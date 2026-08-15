@@ -34,6 +34,10 @@ jobs:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: test_db
+      REGION_NAME: us-east-1        
+      AWS_ACCESS_KEY_ID: testing   
+      AWS_SECRET_ACCESS_KEY: testing
+      BUCKET_NAME: test-bucket
 
     runs-on: ubuntu-24.04
     defaults:
