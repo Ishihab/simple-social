@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   build-scan-push:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: code
@@ -48,7 +48,7 @@ jobs:
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         with:
-          context: .
+          context: code
           load: true
           tags: ${{ env.REGISTRY }}/${{ vars.ECR_REPO_NAME }}:${{ steps.set-image-tag.outputs.image-tag }}
           cache-from: type=gha
@@ -78,7 +78,7 @@ jobs:
 
   open-pr:
     needs: build-scan-push
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     outputs:
       updated-kustomization: ${{ steps.commit-pr.outputs.updated-kustomization }}
     defaults:
