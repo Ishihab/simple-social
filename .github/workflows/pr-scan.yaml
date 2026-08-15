@@ -4,6 +4,9 @@ on:
   pull_request:
     branches:
       - main
+    paths-ignore: 
+      - .github/**
+      - k8s/**
 
 permissions:
   contents: read

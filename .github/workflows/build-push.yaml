@@ -3,7 +3,9 @@ on:
   push:
     branches:
       - main
-
+    paths-ignore: 
+      - .github/**
+      - k8s/**
  
 permissions:
   id-token: write  
