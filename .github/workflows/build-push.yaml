@@ -81,8 +81,6 @@ jobs:
   open-pr:
     needs: build-scan-push
     runs-on: ubuntu-24.04
-    outputs:
-      updated-kustomization: ${{ steps.bump-image-tag.outputs.updated-kustomization }}
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -95,15 +93,11 @@ jobs:
         with:
           cmd: yq -i '(.images[] | select(.name == "simple-social")) .newName = strenv(IMAGE_NAME) | (.images[] | select(.name == "simple-social")) .newTag = strenv(IMAGE_TAG)' k8s/overlays/dev/kustomization.yaml
 
-
-      - name: output updated kustomization.yaml
-        id: bump-image-tag
-        run: echo "updated-kustomization=$(cat k8s/overlays/dev/kustomization.yaml)" >> $GITHUB_OUTPUT
       - name: Commit and open PR
         uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "Bump image tag to ${{ needs.build-scan-push.outputs.image-tag }}\n\nUpdated kustomization file ${{ steps.bump-image-tag.outputs.updated-kustomization }}"
+          commit-message: "Bump image tag to ${{ needs.build-scan-push.outputs.image-tag }}"
           title: "Bump image tag to ${{ needs.build-scan-push.outputs.image-tag }}"
-          body: "This PR bumps the image tag to ${{ needs.build-scan-push.outputs.image-tag }}. Updated kustomization.yaml is attached."
+          body: "This PR bumps the image tag to ${{ needs.build-scan-push.outputs.image-tag }}."
           branch: bump-image-tag-{{ needs.build-scan-push.outputs.image-tag }}
