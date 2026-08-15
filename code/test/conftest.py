@@ -1,11 +1,11 @@
-import pytest
 import pytest_asyncio
 from bs4 import BeautifulSoup
 from httpx import ASGITransport, AsyncClient
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine, AsyncSession
 from sqlalchemy import event
-from api.dependency import get_async_session
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlalchemy.pool import NullPool
+
+from api.dependency import get_async_session
 from core.config import settings
 from core.db import Base
 from main import app
