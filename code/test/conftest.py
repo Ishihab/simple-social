@@ -160,3 +160,4 @@ async def authed_user_post(authed_normal_user_client):
     assert response.status_code == 200
     assert post_id is not None
     return {"post_id": post_id, "comment_id": comment_id, "is_liked": is_liked}
+
