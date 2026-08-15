@@ -90,3 +90,4 @@ async def delete_orphaned_objects_util():
             await delete_orphaned_objects(session)
     except ClientError as e:
         logger.error(f"Error deleting orphaned objects: {e}")
+
