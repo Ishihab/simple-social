@@ -30,9 +30,9 @@ class Settings(BaseSettings):
 
     ENABLE_METRICS: bool = True
 
-    POSTGRES_SERVER: str
+    POSTGRES_SERVER: str = ""
     POSTGRES_PORT: int | None = None
-    POSTGRES_USER: str
+    POSTGRES_USER: str = ""
     POSTGRES_PASSWORD: str = ""
     POSTGRES_DB: str = ""
 
