@@ -21,7 +21,7 @@ class UserRead(users_schemas.BaseUser[UUID]):
     avatar_url: str | None = None
     created_at: datetime
     bio: str | None = None
-    model_config = { # noqa: RUF012
+    model_config = {  # noqa: RUF012
         "from_attributes": True,
     }
 

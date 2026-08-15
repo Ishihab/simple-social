@@ -15,15 +15,34 @@ instrumentator.add(
         should_include_handler=True,
         should_include_method=False,
         should_include_status=True,
-        metric_namespace="simple_social",
-        metric_subsystem="request_size",
+      
     )
 ).add(
     metrics.response_size(
         should_include_handler=True,
         should_include_method=False,
         should_include_status=True,
-        metric_namespace="simple_social",
-        metric_subsystem="response_size",
+       
+    )
+).add(
+    metrics.latency(
+        should_include_handler=True,
+        should_include_method=False,
+        should_include_status=True,
+        
+    )
+).add(
+    metrics.requests(
+        should_include_handler=True,
+        should_include_method=False,
+        should_include_status=True,
+       
+    )
+).add(
+    metrics.combined_size(
+        should_include_handler=True,
+        should_include_method=False,
+        should_include_status=True,
+        
     )
 )

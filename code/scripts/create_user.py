@@ -1,9 +1,11 @@
 import asyncio
 import sys
 from pathlib import Path
-from utils import create_user
-from core.config import settings
+
 from fastapi_users.exceptions import UserAlreadyExists
+
+from core.config import settings
+from utils import create_user
 
 parent_dir = Path(__file__).resolve().parent.parent
 

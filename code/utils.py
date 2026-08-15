@@ -30,24 +30,24 @@ async def create_user(
 ):
     async def _create(session):
         async with (
-                    get_user_db_context(session) as user_db,
-                    get_user_manager_context(user_db) as user_manager,
-                ):
-                user_create = UserCreate(
-                    email=email,
-                    password=password,
-                    is_superuser=is_superuser,
-                    username=username,
-                    display_name=display_name,
-                    avatar_url=avatar_url,
-                )
-                try:
-                    user = await user_manager.create(user_create)
-                except UserAlreadyExists:
-                    logger.info(f"User with email {email} already exists.")
-                    raise
-                print(f"User {user.id} created successfully.")
-                return user
+            get_user_db_context(session) as user_db,
+            get_user_manager_context(user_db) as user_manager,
+        ):
+            user_create = UserCreate(
+                email=email,
+                password=password,
+                is_superuser=is_superuser,
+                username=username,
+                display_name=display_name,
+                avatar_url=avatar_url,
+            )
+            try:
+                user = await user_manager.create(user_create)
+            except UserAlreadyExists:
+                logger.info(f"User with email {email} already exists.")
+                raise
+            print(f"User {user.id} created successfully.")
+            return user
 
     try:
         if session is not None:

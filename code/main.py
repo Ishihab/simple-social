@@ -10,7 +10,6 @@ from fastapi_pagination import add_pagination
 from api.dependency import auth_backend, fastapi_users
 from api.route.auth import router as auth_router
 from api.route.comments import router as comments_router
-from api.route.debug import router as debug_router
 from api.route.likes import router as likes_router
 from api.route.posts import router as posts_router
 from api.route.uploads import router as uploads_router
@@ -64,7 +63,6 @@ app.include_router(posts_router)
 app.include_router(comments_router)
 app.include_router(likes_router)
 app.include_router(uploads_router)
-app.include_router(debug_router, prefix="/debug", tags=["debug"])
 add_pagination(app)
 app.include_router(
     fastapi_users.get_auth_router(auth_backend), prefix="/auth/cookie", tags=["auth"]
