@@ -96,11 +96,11 @@ jobs:
           IMAGE_NAME: ${{ needs.build-scan-push.outputs.image-name }}
         uses: mikefarah/yq@1b9b4ac5187171d2e5e3129be0cfa827c7f9d53d
         with:
-          cmd: yq -i '(.images[] | select(.name == "simple-social")) .newName = strenv(IMAGE_NAME) | (.images[] | select(.name == "simple-social")) .newTag = strenv(IMAGE_TAG)' kustomization.yaml
+          cmd: yq -i '(.images[] | select(.name == "simple-social")) .newName = strenv(IMAGE_NAME) | (.images[] | select(.name == "simple-social")) .newTag = strenv(IMAGE_TAG)' ${{ github.workspace }}/k8s/overlays/dev/kustomization.yaml
 
       - name: output updated kustomization.yaml
         id: bump-image-tag
-        run: echo "updated-kustomization=$(cat kustomization.yaml)" >> $GITHUB_OUTPUT
+        run: echo "updated-kustomization=$(cat ${{ github.workspace }}/k8s/overlays/dev/kustomization.yaml)" >> $GITHUB_OUTPUT
       - name: Commit and open PR
         uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1
         with:
