@@ -1,23 +1,24 @@
+import pytest
 import pytest_asyncio
 from bs4 import BeautifulSoup
 from httpx import ASGITransport, AsyncClient
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
-from sqlalchemy.pool import StaticPool
-
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine, AsyncSession
+from sqlalchemy import event
 from api.dependency import get_async_session
+from sqlalchemy.pool import NullPool
 from core.config import settings
 from core.db import Base
 from main import app
 from utils import create_user
 
-TEST_DATABASE_URL = "sqlite+aiosqlite:///file:testmemdb?mode=memory&cache=shared"
+TEST_DATABASE_URL = str(settings.SQLALCHEMY_DATABASE_URI)
 engine = create_async_engine(
     TEST_DATABASE_URL,
-    echo=False,
-    poolclass=StaticPool,
+    poolclass=NullPool,
+    echo=True,
 )
 
-test_async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
+TestingSessionLocal = async_sessionmaker(engine, expire_on_commit=False)
 
 
 @pytest_asyncio.fixture(scope="session", autouse=True)
@@ -32,102 +33,93 @@ async def setup_database():
     await engine.dispose()
 
 
-@pytest_asyncio.fixture(scope="session")
-async def session_db():
-    async with test_async_session_maker() as session:
-        yield session
-
 
 @pytest_asyncio.fixture
-async def test_async_session():
-    async with test_async_session_maker() as session:
+async def db_session():
+    async with engine.connect() as conn:
+        trans = await conn.begin()
+        session = TestingSessionLocal(bind=conn)
+        nested = await conn.begin_nested()
+
+        @event.listens_for(session.sync_session, "after_transaction_end")
+        def restart_savepoint(session, transaction):
+            nonlocal nested
+            if not nested.is_active:
+                nested = conn.sync_connection.begin_nested()
+
         try:
             yield session
         finally:
-            await session.rollback()
+            await session.close()
+            await trans.rollback()
+
+
+def _make_client_factory(db_session):
+    async def override_get_async_session():
+        yield db_session
+    app.dependency_overrides[get_async_session] = override_get_async_session
+    return ASGITransport(app=app)
 
 
 @pytest_asyncio.fixture
-async def async_normal_user_client(test_async_session):
-    async def override_get_async_session():
-        async with test_async_session_maker() as session:
-            try:
-                yield session
-            finally:
-                await session.rollback()
+async def async_normal_user_client(db_session):
+    transport = _make_client_factory(db_session)
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+        yield ac
+    app.dependency_overrides.clear()
 
-    app.dependency_overrides[get_async_session] = override_get_async_session
-    transport = ASGITransport(app=app)
+
+
+
+@pytest_asyncio.fixture
+async def async_super_user_client(db_session):
+    transport = _make_client_factory(db_session)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         yield ac
     app.dependency_overrides.clear()
 
 
 @pytest_asyncio.fixture
-async def async_super_user_client(test_async_session):
-    async def override_get_async_session():
-        async with test_async_session_maker() as session:
-            try:
-                yield session
-            finally:
-                await session.rollback()
-
-    app.dependency_overrides[get_async_session] = override_get_async_session
-    transport = ASGITransport(app=app)
+async def async_normal_user_2_client(db_session):
+    transport = _make_client_factory(db_session)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         yield ac
     app.dependency_overrides.clear()
 
 
 @pytest_asyncio.fixture
-async def async_normal_user_2_client(test_async_session):
-    async def override_get_async_session():
-        async with test_async_session_maker() as session:
-            try:
-                yield session
-            finally:
-                await session.rollback()
-
-    app.dependency_overrides[get_async_session] = override_get_async_session
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as ac:
-        yield ac
-    app.dependency_overrides.clear()
-
-
-@pytest_asyncio.fixture(scope="session")
-async def create_test_super_user(session_db):
+async def create_test_super_user(db_session):
     return await create_user(
         email=settings.FIRST_SUPERUSER_EMAIL,
         password=settings.FIRST_SUPERUSER_PASSWORD,
         username=settings.FIRST_SUPERUSER_USERNAME,
         display_name=settings.FIRST_SUPERUSER_DISPLAY_NAME,
         is_superuser=True,
-        session=session_db,
+        session=db_session,
     )
 
 
-@pytest_asyncio.fixture(scope="session")
-async def create_test_user(session_db):
+@pytest_asyncio.fixture
+async def create_test_user(db_session):
     return await create_user(
         email="normaluser@example.com",
         password="password123",
         username="normaluser",
         display_name="Normal User",
         is_superuser=False,
-        session=session_db,
+        session=db_session,
     )
 
 
-@pytest_asyncio.fixture(scope="session")
-async def create_test_user_2(session_db):
+@pytest_asyncio.fixture
+async def create_test_user_2(db_session):
     return await create_user(
         email="normaluser2@example.com",
         password="password123",
         username="normaluser2",
         display_name="Normal User 2",
         is_superuser=False,
-        session=session_db,
+        session=db_session,
     )
 
 
