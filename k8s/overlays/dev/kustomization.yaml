@@ -12,4 +12,4 @@ patches:
 images:
   - name: simple-social
     newName: 992646609003.dkr.ecr.us-east-1.amazonaws.com/gitops-infra-terraform-ecr
-    newTag: sha-80f458c
+    newTag: sha-2c9e63e
