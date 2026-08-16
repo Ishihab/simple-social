@@ -19,6 +19,9 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 FROM python:3.13-slim-trixie
 
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+
+
 COPY --from=builder /app/.venv /app/.venv
 COPY --from=builder /app/api /app/api
 COPY --from=builder /app/core /app/core
@@ -41,10 +44,11 @@ COPY --from=builder /app/utils.py /app/utils.py
 ENV PATH="/app/.venv/bin:$PATH"
 
 
+USER appuser
 WORKDIR /app
 
-EXPOSE 80
+EXPOSE 8000
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 
 
