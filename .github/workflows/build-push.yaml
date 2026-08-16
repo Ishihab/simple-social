@@ -98,7 +98,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "chore: Bump image tag to ${{ needs.build-scan-push.outputs.image-tag }}"
-          title: "Bump image tag and image name to ${{ needs.build-scan-push.outputs.image-name }}:${{ needs.build-scan-push.outputs.image-tag }}"
-          body: "This is an automated PR to bump the image tag from CI. This PR bumps the image tag and image name to ${{ needs.build-scan-push.outputs.image-name }}:${{ needs.build-scan-push.outputs.image-tag }}."
+          title: "Bump image tag to ${{ needs.build-scan-push.outputs.image-tag }}"
+          body: "This is an automated PR to bump the image tag from CI. This PR bumps the image tag to ${{ needs.build-scan-push.outputs.image-tag }}"
           branch: bump-image-tag-${{ needs.build-scan-push.outputs.image-tag }}
           base: "main"
